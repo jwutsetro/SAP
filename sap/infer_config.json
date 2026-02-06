@@ -1,10 +1,10 @@
 {
   "model_type": "skeletal",
-  "input_dir": "/path/to/input_dir",
+  "input_dir": "/FARM/jwuts/Data/Example_patient",
   "case_list": null,
   "modalities": ["T1.nii.gz", "b1000.nii.gz"],
-  "output_dir": "/path/to/output_dir",
-  "weights": "/path/to/sap_checkpoint.pt",
+  "output_dir": "/FARM/jwuts/Data/Example_output",
+  "weights": "/FARM/jwuts/Train_MICCAI/Training_paper_suprem/Training_paper/cross_validation_large/1/CATL/model_final.pt",
   "roi_x": 96,
   "roi_y": 96,
   "roi_z": 96,
