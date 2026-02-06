@@ -4,7 +4,7 @@
   "case_list": null,
   "modalities": ["T1.nii.gz", "b1000.nii.gz"],
   "output_dir": "/FARM/jwuts/Data/Example_output",
-  "weights": "/FARM/jwuts/Train_MICCAI/Training_suprem_bone_Pretrain/Training_paper/cross_validation/1/from_scratch/model_final.pt",
+  "weights": "/FARM/jwuts/Train_MICCAI/Training_paper_suprem/Training_paper/cross_validation_large/1/CATL/model_final.pt",
   "roi_x": 96,
   "roi_y": 96,
   "roi_z": 96,
