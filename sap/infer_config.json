@@ -8,7 +8,7 @@
   "roi_x": 96,
   "roi_y": 96,
   "roi_z": 96,
-  "sw_batch_size": 4,
+  "sw_batch_size": 20,
   "infer_overlap": 0.5,
   "feature_size": 48,
   "in_channels": 2,
@@ -16,6 +16,6 @@
   "use_checkpoint": false,
   "save_probs": false,
   "prob_class": 1,
-  "majority_vote": false,
+  "majority_vote": true,
   "no_amp": false
 }
