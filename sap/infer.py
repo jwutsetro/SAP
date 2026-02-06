@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 from pathlib import Path
@@ -6,6 +7,7 @@ from typing import List, Tuple
 import nibabel as nib
 import numpy as np
 import torch
+from scipy import ndimage
 from monai.data import DataLoader, Dataset
 from monai.inferers import sliding_window_inference
 from monai.networks.nets import SwinUNETR
@@ -14,6 +16,22 @@ from monai.transforms import Compose, EnsureChannelFirstD, LoadImageD, ScaleInte
 from sap.config import DEFAULT_INFER, load_config
 
 DEFAULT_CONFIG = Path(__file__).with_name("infer_config.json")
+
+
+def _parse_args():
+    parser = argparse.ArgumentParser(description="Run SAP inference.")
+    parser.add_argument(
+        "config",
+        nargs="?",
+        default=str(DEFAULT_CONFIG),
+        help="Path to the inference JSON config.",
+    )
+    parser.add_argument(
+        "--majority-vote",
+        action="store_true",
+        help="Apply connected-component majority vote postprocessing.",
+    )
+    return parser.parse_args()
 
 
 def _strip_prefix(state_dict, prefix):
@@ -74,9 +92,32 @@ def _build_cases(input_dir: str, case_list: str, modalities: List[str]) -> List[
     return cases
 
 
+def _majority_vote_components(pred: np.ndarray) -> np.ndarray:
+    mask = pred > 0
+    if not np.any(mask):
+        return pred
+    structure = ndimage.generate_binary_structure(rank=3, connectivity=1)
+    labeled, num = ndimage.label(mask, structure=structure)
+    if num == 0:
+        return pred
+    out = pred.copy()
+    for cid in range(1, num + 1):
+        component = labeled == cid
+        labels = pred[component]
+        if labels.size == 0:
+            continue
+        counts = np.bincount(labels)
+        majority_label = int(np.argmax(counts))
+        out[component] = majority_label
+    return out
+
+
 def main():
-    config_path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_CONFIG
+    parsed = _parse_args()
+    config_path = Path(parsed.config)
     args = load_config(config_path, DEFAULT_INFER)
+    if parsed.majority_vote:
+        args.majority_vote = True
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     amp = (not getattr(args, "no_amp", False)) and device.type == "cuda"
 
@@ -149,6 +190,8 @@ def main():
             for i, case_id in enumerate(case_ids):
                 affine = batch["image_meta_dict"]["affine"][i].cpu().numpy()
                 pred_np = preds[i].cpu().numpy().astype(np.uint8)
+                if args.majority_vote:
+                    pred_np = _majority_vote_components(pred_np)
                 out_path = os.path.join(args.output_dir, f"{case_id}_sap_seg.nii.gz")
                 nib.save(nib.Nifti1Image(pred_np, affine), out_path)
 

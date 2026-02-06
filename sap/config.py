@@ -20,6 +20,7 @@ DEFAULT_INFER = {
     "use_checkpoint": False,
     "save_probs": False,
     "prob_class": 1,
+    "majority_vote": False,
     "no_amp": False,
 }
 
