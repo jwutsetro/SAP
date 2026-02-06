@@ -1,0 +1,20 @@
+{
+  "model_type": "skeletal",
+  "input_dir": "/path/to/input_dir",
+  "case_list": null,
+  "modalities": ["T1.nii.gz", "b1000.nii.gz"],
+  "output_dir": "/path/to/output_dir",
+  "weights": "/path/to/sap_checkpoint.pt",
+  "roi_x": 96,
+  "roi_y": 96,
+  "roi_z": 96,
+  "sw_batch_size": 4,
+  "infer_overlap": 0.5,
+  "feature_size": 48,
+  "in_channels": 2,
+  "out_channels": null,
+  "use_checkpoint": false,
+  "save_probs": false,
+  "prob_class": 1,
+  "no_amp": false
+}
